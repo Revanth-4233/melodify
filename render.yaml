@@ -8,10 +8,7 @@ services:
     startCommand: npm start
     envVars:
       - key: NEXT_PUBLIC_API_URL
-        fromService:
-          name: melodify-backend
-          type: web
-          property: url
+        sync: false
 
   # Spring Boot Backend
   - type: web
