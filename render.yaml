@@ -1,0 +1,45 @@
+services:
+  # Next.js Frontend
+  - type: web
+    name: melodify-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          name: melodify-backend
+          type: web
+          property: url
+
+  # Spring Boot Backend
+  - type: web
+    name: melodify-backend
+    env: docker
+    rootDir: backend
+    envVars:
+      - key: DB_URL
+        fromDatabase:
+          name: melodify-db
+          property: connectionString
+      - key: DB_USER
+        fromDatabase:
+          name: melodify-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: melodify-db
+          property: password
+      - key: DB_DRIVER
+        value: org.postgresql.Driver
+      - key: DB_DIALECT
+        value: org.hibernate.dialect.PostgreSQLDialect
+      - key: APP_JWT_SECRET
+        generateValue: true
+
+databases:
+  # Render PostgreSQL Database
+  - name: melodify-db
+    databaseName: melodify
+    user: melodify_user
