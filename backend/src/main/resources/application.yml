@@ -1,0 +1,43 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: music-catalog-insights
+
+  # MySQL Database Configuration
+  datasource:
+    url: jdbc:mysql://localhost:3306/melodify?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  # Cache configuration
+  cache:
+    type: simple
+
+# JWT Configuration
+app:
+  jwt:
+    secret: MusicPlatformSuperSecretKeyForJWTTokenGeneration2024ThisMustBeLongEnoughForHS512
+    expiration-ms: 86400000  # 24 hours
+
+# iTunes API Configuration
+itunes:
+  api:
+    base-url: https://itunes.apple.com
+
+# Logging
+logging:
+  level:
+    com.musicplatform: INFO
+    org.springframework.security: INFO
