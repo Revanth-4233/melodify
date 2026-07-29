@@ -29,7 +29,7 @@ services:
       - key: DB_NAME
         fromDatabase:
           name: melodify-db
-          property: databaseName
+          property: database
       - key: DB_USER
         fromDatabase:
           name: melodify-db
