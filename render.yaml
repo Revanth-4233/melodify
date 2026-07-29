@@ -3,6 +3,7 @@ services:
   - type: web
     name: melodify-frontend
     env: node
+    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
     startCommand: npm start
@@ -14,6 +15,7 @@ services:
   - type: web
     name: melodify-backend
     env: docker
+    plan: free
     rootDir: backend
     envVars:
       - key: DB_URL
@@ -40,3 +42,4 @@ databases:
   - name: melodify-db
     databaseName: melodify
     user: melodify_user
+    plan: free
