@@ -2,90 +2,86 @@
 
 Melodify is a premium, full-stack web application designed to let users explore a massive public music catalog, curate a personal music library, view analytics on their listening habits, and receive personalized, AI-driven insights into their music taste.
 
-This project was built as an end-to-end take-home assignment to demonstrate modern full-stack development, secure API design, and third-party API integrations (iTunes & AI).
-
 ## ✨ Features
 
 - **Public Catalog Search**: Search the global iTunes database for artists, albums, and songs. 
 - **Global Audio Player**: Listen to 30-second official audio previews seamlessly via a persistent global player sidebar.
 - **Personal Library**: Authenticated users can save songs to their personal library, rate them, and add personal notes.
 - **Advanced Analytics**: Visualizes the user's library statistics (top genres, decades, artist distribution) using beautiful interactive charts.
-- **AI-Driven Insights**: Integrates with the Google Gemini AI to analyze the user's saved library and generate personalized recommendations and music taste profiling.
-- **Secure Authentication**: Stateless, secure authentication using JSON Web Tokens (JWT).
-- **Premium Aesthetics**: A highly polished UI featuring a "Deep Space" dark theme, glassmorphism, responsive design, and fluid micro-animations.
-
-## 🛠️ Technology Stack
-
-### Frontend
-- **Framework**: Next.js (App Router) & React.js
-- **Styling**: Vanilla CSS (Global variables, CSS Modules, Flexbox/Grid)
-- **Data Visualization**: Recharts
-- **Icons/Fonts**: Google Fonts (Inter)
-
-### Backend
-- **Framework**: Java 17 & Spring Boot 3
-- **Security**: Spring Security & JWT Token Authentication
-- **Data Access**: Spring Data JPA & Hibernate
-- **AI Integration**: Google Gemini API via REST
-- **External API**: iTunes Search API
-
-### Database
-- **Primary Database**: MySQL (Configured for local hosting)
+- **AI-Driven Insights**: Integrates with Google Gemini AI to analyze the user's saved library and generate personalized recommendations and music taste profiling.
 
 ---
 
-## 🚀 Local Setup & Installation
+## 🏗️ Architecture & Entity Design
+
+### Database Schema & Entity Choice
+The application utilizes a relational database (PostgreSQL/MySQL) with a streamlined, two-entity architecture designed for rapid iteration and decoupled metadata:
+
+1. **`users` Table**: Manages authentication and identity. Contains `username`, `email`, and a BCrypt-hashed `password`.
+2. **`saved_albums` Table**: Represents the user's personal library. It has a Many-to-One relationship with the `users` table.
+
+**Schema Design Choice:** 
+Instead of creating a complex normalized web of `Artists`, `Albums`, and `Tracks` tables, the `saved_albums` table acts as a localized cache of the iTunes API metadata (storing `artistName`, `collectionName`, `artworkUrl`, `genre`, etc.) directly alongside user-specific data (`userRating` and `userNotes`). 
+
+### ⚖️ Technical Trade-offs
+
+1. **Denormalized Library vs. Normalized Catalog:**
+   * *Trade-off*: By storing iTunes metadata directly in the `saved_albums` table, we duplicate data if two users save the exact same song.
+   * *Benefit*: It entirely eliminates the need for complex JOINs. Fetching a user's library is a single, lightning-fast query. It also insulates the app from iTunes API rate limits, as we only query iTunes during the initial search, not when loading the library.
+2. **Stateless JWT Authentication vs. Stateful Sessions:**
+   * *Trade-off*: JWTs cannot easily be invalidated on the server before they expire (without maintaining a blacklist, which defeats the purpose of being stateless).
+   * *Benefit*: Complete decoupling of the Next.js frontend and Spring Boot backend. The backend scales horizontally without needing sticky sessions or a centralized Redis session store.
+3. **Client-Side vs. Server-Side Analytics Calculation:**
+   * *Trade-off*: Analytics (genres, decades) are calculated on the backend (`AnalyticsService`) and served via a DTO, rather than pushing raw data to the frontend for calculation.
+   * *Benefit*: Reduces the JSON payload size sent over the network and centralizes business logic, making it easier to add mobile clients in the future.
+
+---
+
+## 🤖 AI Feature Implementation
+
+The platform integrates with the **Google Gemini API** to provide "Music Aura" insights. 
+- **How it works**: When a user requests insights, the backend aggregates their library data (extracting all unique genres, top artists, and release decades).
+- **Prompt Engineering**: This aggregated profile is injected into a strict system prompt instructing Gemini to act as a professional music critic. The prompt forces Gemini to return a precisely structured JSON response.
+- **Output**: The AI generates a customized psychological profile of their music taste, predicts niche subgenres they might like, and recommends three specific songs (not currently in their library) that match their vibe.
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Next.js (App Router), React, Vanilla CSS, Recharts
+- **Backend**: Java 17, Spring Boot 3, Spring Security (JWT)
+- **Database**: PostgreSQL (Render) / MySQL (Local), Spring Data JPA, Hibernate
+- **APIs**: iTunes Search API, Google Gemini AI
+
+---
+
+## 🚀 Setup & Installation
 
 ### Prerequisites
-- **Java 17+** and **Maven** installed
-- **Node.js 18+** and **npm** installed
-- **MySQL Server** installed and running on default port (3306)
+- Java 17+ and Node.js 18+
+- MySQL or PostgreSQL database
 
 ### 1. Database Setup
-Log into your local MySQL instance and create a fresh database for the application:
+Create a fresh local database:
 ```sql
 CREATE DATABASE melodify;
 ```
 
 ### 2. Backend Setup
-Navigate to the backend directory and configure your environment:
-```bash
-cd backend
-```
+Navigate to the `backend` directory. Open `src/main/resources/application.yml` and add your database credentials and Gemini API key (`app.gemini.api-key`).
 
-Open `src/main/resources/application.yml` and ensure your database credentials and API keys are correct:
-- Update the MySQL `username` and `password` if yours differ from `root`/`root`.
-- Insert your Google Gemini API key into `app.gemini.api-key`.
-
-Start the Spring Boot server:
+Run the Spring Boot server (Hibernate will automatically generate the schema):
 ```bash
 mvn clean compile spring-boot:run
 ```
-*Note: Hibernate will automatically generate all necessary database tables upon startup.*
 
 ### 3. Frontend Setup
-Open a new terminal window, navigate to the frontend directory, and install the dependencies:
+Navigate to the `frontend` directory, install dependencies, and run the server:
 ```bash
-cd frontend
 npm install
-```
-
-Start the Next.js development server:
-```bash
 npm run dev
 ```
 
-### 4. Access the Application
-Open your browser and navigate to **[http://localhost:3000](http://localhost:3000)**. 
-Create a new account, login, and start building your library!
-
----
-
-## 🏛️ Application Architecture
-
-- **Stateless API**: The Spring Boot backend exposes a purely stateless RESTful API. Client sessions are managed entirely via JWTs stored in the browser.
-- **Responsive Component Design**: The Next.js frontend employs a strict component-based architecture with global React Context (`AuthProvider`, `PlayerProvider`, `ToastProvider`) managing complex application state.
-- **Proxy/CORS Management**: The Spring Boot server is configured to accept Cross-Origin requests specifically from the frontend's local development port, ensuring secure client-server communication.
-
-## 📝 License
-This project is created for educational/demonstration purposes as part of a technical assignment.
+### 4. Render Deployment (Cloud)
+This repository includes a `render.yaml` Blueprint and `Dockerfile`. 
+To deploy, connect this repository to a Render account. It will automatically provision a free PostgreSQL database, build the Spring Boot Docker container, and deploy the Next.js frontend.
