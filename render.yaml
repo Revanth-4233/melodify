@@ -18,10 +18,18 @@ services:
     plan: free
     rootDir: backend
     envVars:
-      - key: DB_URL
+      - key: DB_HOST
         fromDatabase:
           name: melodify-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: melodify-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: melodify-db
+          property: databaseName
       - key: DB_USER
         fromDatabase:
           name: melodify-db
