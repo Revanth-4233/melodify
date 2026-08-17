@@ -1,0 +1,10 @@
+{
+  "appId": "com.musicinsights.auramusic",
+  "appName": "AuraMusic",
+  "webDir": "dist",
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
