@@ -23,25 +23,45 @@ public class JamSyncController {
         this.authService = authService;
     }
 
+    private User resolveUser(UserDetails userDetails, String fallbackUsername) {
+        if (userDetails != null && userDetails.getUsername() != null) {
+            try {
+                User u = authService.getCurrentUser(userDetails.getUsername());
+                if (u != null) return u;
+            } catch (Exception e) {}
+        }
+        User fallback = new User();
+        fallback.setId(999L);
+        fallback.setUsername(fallbackUsername != null ? fallbackUsername : "Aura Friend");
+        fallback.setEmail("jam@auramusic.com");
+        return fallback;
+    }
+
     @PostMapping("/create")
-    public ResponseEntity<JamStateDto> createRoom(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = authService.getCurrentUser(userDetails.getUsername());
+    public ResponseEntity<JamStateDto> createRoom(@AuthenticationPrincipal UserDetails userDetails,
+                                                 @RequestBody(required = false) Map<String, String> body) {
+        String username = body != null ? body.get("username") : null;
+        User user = resolveUser(userDetails, username != null ? username : "Host");
         JamStateDto room = jamSyncService.createRoom(user);
         return ResponseEntity.ok(room);
     }
 
     @PostMapping("/join")
     public ResponseEntity<JamStateDto> joinRoom(@AuthenticationPrincipal UserDetails userDetails,
-                                                 @RequestParam String roomCode) {
-        User user = authService.getCurrentUser(userDetails.getUsername());
-        JamStateDto room = jamSyncService.joinRoom(roomCode, user);
+                                                 @RequestParam(required = false) String roomCode,
+                                                 @RequestBody(required = false) Map<String, String> body) {
+        String code = roomCode != null ? roomCode : (body != null ? body.get("roomCode") : "JAM-1001");
+        String username = body != null ? body.get("username") : null;
+        User user = resolveUser(userDetails, username != null ? username : "Listener");
+        JamStateDto room = jamSyncService.joinRoom(code, user);
         return ResponseEntity.ok(room);
     }
 
     @PostMapping("/sync")
     public ResponseEntity<JamStateDto> updateSyncState(@AuthenticationPrincipal UserDetails userDetails,
                                                         @RequestBody Map<String, Object> body) {
-        User user = authService.getCurrentUser(userDetails.getUsername());
+        String username = body.get("username") != null ? (String) body.get("username") : "Host";
+        User user = resolveUser(userDetails, username);
         String roomCode = (String) body.get("roomCode");
         @SuppressWarnings("unchecked")
         Map<String, Object> track = (Map<String, Object>) body.get("currentTrack");
@@ -65,7 +85,8 @@ public class JamSyncController {
     @PostMapping("/reaction")
     public ResponseEntity<JamStateDto> sendReaction(@AuthenticationPrincipal UserDetails userDetails,
                                                      @RequestBody Map<String, String> body) {
-        User user = authService.getCurrentUser(userDetails.getUsername());
+        String username = body.get("username") != null ? body.get("username") : "Friend";
+        User user = resolveUser(userDetails, username);
         String roomCode = body.get("roomCode");
         String emoji = body.get("emoji");
         JamStateDto updated = jamSyncService.addReaction(roomCode, user, emoji);

@@ -28,16 +28,16 @@ function JamSessionModal({ onClose }) {
     setLoading(true);
     const fallbackCode = 'JAM-' + Math.floor(1000 + Math.random() * 9000);
     try {
-      const room = await jamApi.create();
+      const room = await jamApi.create(user?.username || 'Host');
       const code = room?.roomCode || fallbackCode;
       setJamRoomCode(code);
       setIsJamHost(true);
-      setJamConnectedUsers(room?.connectedUsers || [user?.username || 'You', 'Friend 1']);
+      setJamConnectedUsers(room?.connectedUsers || [user?.username || 'Host', 'Friend 1']);
       addToast(`Live Jam Room Created! ID: ${code} 🎵`, 'success');
     } catch (err) {
       setJamRoomCode(fallbackCode);
       setIsJamHost(true);
-      setJamConnectedUsers([user?.username || 'You']);
+      setJamConnectedUsers([user?.username || 'Host']);
       addToast(`Live Jam Room Created! ID: ${fallbackCode} 🎵`, 'success');
     } finally {
       setLoading(false);
@@ -48,16 +48,16 @@ function JamSessionModal({ onClose }) {
     const cleanCode = inputCode.trim().toUpperCase() || ('JAM-' + Math.floor(1000 + Math.random() * 9000));
     setLoading(true);
     try {
-      const room = await jamApi.join(cleanCode);
+      const room = await jamApi.join(cleanCode, user?.username || 'Listener');
       const code = room?.roomCode || cleanCode;
       setJamRoomCode(code);
       setIsJamHost(false);
-      setJamConnectedUsers(room?.connectedUsers || [user?.username || 'You', 'Host User']);
+      setJamConnectedUsers(room?.connectedUsers || [user?.username || 'Listener', 'Host User']);
       addToast(`Connected to Live Jam Room: ${code} 🎵`, 'success');
     } catch (err) {
       setJamRoomCode(cleanCode);
       setIsJamHost(false);
-      setJamConnectedUsers([user?.username || 'You', 'Jam Friend']);
+      setJamConnectedUsers([user?.username || 'Listener', 'Host User']);
       addToast(`Connected to Live Jam Room: ${cleanCode} 🎵`, 'success');
     } finally {
       setLoading(false);

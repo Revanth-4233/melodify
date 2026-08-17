@@ -156,35 +156,37 @@ export const aiApi = {
 };
 
 export const jamApi = {
-  create: () =>
+  create: (username) =>
     fetchWithTimeout(`${API_BASE}/jam/create`, {
       method: 'POST',
       headers: headers(),
+      body: JSON.stringify({ username: username || 'Host' })
     }).then(handleResponse),
 
-  join: (roomCode) =>
+  join: (roomCode, username) =>
     fetchWithTimeout(`${API_BASE}/jam/join?roomCode=${encodeURIComponent(roomCode)}`, {
       method: 'POST',
       headers: headers(),
+      body: JSON.stringify({ roomCode, username: username || 'Listener' })
     }).then(handleResponse),
 
-  sync: (roomCode, currentTrack, isPlaying, currentTime) =>
+  sync: (roomCode, currentTrack, isPlaying, currentTime, username) =>
     fetchWithTimeout(`${API_BASE}/jam/sync`, {
       method: 'POST',
       headers: headers(),
-      body: JSON.stringify({ roomCode, currentTrack, isPlaying, currentTime }),
-    }, 2000).then(handleResponse),
+      body: JSON.stringify({ roomCode, currentTrack, isPlaying, currentTime, username: username || 'Host' }),
+    }, 2500).then(handleResponse),
 
   getState: (roomCode) =>
     fetchWithTimeout(`${API_BASE}/jam/state/${encodeURIComponent(roomCode)}`, {
       headers: headers(),
-    }, 2000).then(handleResponse),
+    }, 2500).then(handleResponse),
 
-  sendReaction: (roomCode, emoji) =>
+  sendReaction: (roomCode, emoji, username) =>
     fetchWithTimeout(`${API_BASE}/jam/reaction`, {
       method: 'POST',
       headers: headers(),
-      body: JSON.stringify({ roomCode, emoji }),
+      body: JSON.stringify({ roomCode, emoji, username: username || 'Friend' }),
     }).then(handleResponse),
 };
 

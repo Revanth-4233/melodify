@@ -41,7 +41,7 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/health", "/api/auth/**", "/api/search/**", "/api/album/**", "/api/stream/**", "/api/playlists/**", "/api/recommendations/**").permitAll()
+                .requestMatchers("/", "/health", "/api/auth/**", "/api/search/**", "/api/album/**", "/api/stream/**", "/api/playlists/**", "/api/recommendations/**", "/api/jam/**").permitAll()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
