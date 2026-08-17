@@ -368,48 +368,42 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
           for (const t of initialTracks) addTrack({ ...t, collectionName: title });
         }
 
-        // Fetch multi-page results from JioSaavn direct API + CORS wrappers
+        // Fetch multi-page results directly from JioSaavn official API + proxies
         try {
-          const apiEndpoints = [
-            `https://saavn-api.vercel.app/search/songs?query=${encodeURIComponent(primaryQ)}`,
-            `https://jiosaavn-api-sigma.vercel.app/search/songs?query=${encodeURIComponent(primaryQ)}&limit=35`,
+          const jioUrls = [
+            `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(primaryQ)}`,
+            `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&p=2&n=50&q=${encodeURIComponent(primaryQ)}`,
             `/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(primaryQ)}`
           ];
 
-          for (const endpointUrl of apiEndpoints) {
-            try {
-              const res = await fetch(endpointUrl, { signal: AbortSignal.timeout(5000) });
-              if (!res.ok) continue;
-              const json = await res.json();
-              const items = Array.isArray(json) ? json : (json?.data?.results || json?.results || []);
-              if (Array.isArray(items) && items.length > 0) {
-                for (let i = 0; i < items.length; i++) {
-                  const item = items[i];
-                  if (!item) continue;
-                  const tName = decodeEntities(item.song || item.name || item.title || '');
-                  if (!tName) continue;
-                  const aName = decodeEntities(item.primary_artists || item.singers || item.primaryArtists || item.artist || 'Various Artists');
-                  const cName = decodeEntities(item.album || item.album?.name || title);
-                  const artUrl = item.image ? (typeof item.image === 'string' ? item.image.replace('150x150', '500x500') : (item.image[2]?.link || item.image[0]?.link || '')) : '';
-                  const durMs = item.duration ? parseInt(item.duration, 10) * 1000 : 210000;
-                  addTrack({
-                    trackId: item.id || (900000 + i * 13),
-                    appleCatalogId: item.id || (900000 + i * 13),
-                    trackName: tName,
-                    artistName: aName,
-                    collectionName: cName,
-                    artworkUrl100: artUrl,
-                    artworkUrl60: artUrl,
-                    previewUrl: item.media_preview_url || item.url || '',
-                    encrypted_media_url: item.encrypted_media_url || item.encryptedMediaUrl || '',
-                    trackTimeMillis: durMs,
-                    primaryGenreName: genre,
-                    releaseDate: item.year || releaseDate
-                  });
-                }
+          const jioPromises = jioUrls.map(u => fetch(u, { signal: AbortSignal.timeout(6000) }).then(r => r.json()).catch(() => null));
+          const jioResArr = await Promise.all(jioPromises);
+          for (const jioData of jioResArr) {
+            const rawResults = jioData?.results;
+            if (Array.isArray(rawResults)) {
+              for (let i = 0; i < rawResults.length; i++) {
+                const item = rawResults[i];
+                if (!item || !item.song) continue;
+                const tName = decodeEntities(item.song);
+                const aName = decodeEntities(item.primary_artists || item.singers || 'Various Artists');
+                const cName = decodeEntities(item.album || title);
+                const artUrl = item.image ? item.image.replace('150x150', '500x500') : '';
+                const durMs = item.duration ? parseInt(item.duration, 10) * 1000 : 210000;
+                addTrack({
+                  trackId: item.id || (900000 + i * 13),
+                  appleCatalogId: item.id || (900000 + i * 13),
+                  trackName: tName,
+                  artistName: aName,
+                  collectionName: cName,
+                  artworkUrl100: artUrl,
+                  artworkUrl60: artUrl,
+                  previewUrl: item.media_preview_url || '',
+                  encrypted_media_url: item.encrypted_media_url || '',
+                  trackTimeMillis: durMs,
+                  primaryGenreName: genre,
+                  releaseDate: item.year || releaseDate
+                });
               }
-            } catch (e) {
-              // try next endpoint
             }
           }
         } catch (e) {
