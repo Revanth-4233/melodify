@@ -111,15 +111,33 @@ function SafeImage({ src, alt, className, style, fallbackIcon }) {
   );
 }
 
+const INSTANT_TELUGU_TRACKS = [
+  { trackId: 101, trackName: 'Neno Butterfly', artistName: 'G.V. Prakash Kumar, Sublahshini', collectionName: 'Vishwanath & Sons', artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 102, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab, Anurag Kulkarni', collectionName: 'Hi Nanna', artworkUrl100: 'https://c.saavncdn.com/269/Hi-Nanna-Telugu-2023-20231124174006-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 103, trackName: 'Chuttamalle', artistName: 'Anirudh Ravichander, Shilpa Rao', collectionName: 'Devara Part 1', artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 104, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: 'Devara Part 1', artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 105, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S, Sri Krishna', collectionName: 'Guntur Kaaram', artworkUrl100: 'https://c.saavncdn.com/834/Guntur-Kaaram-Telugu-2024-20240112003859-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 106, trackName: 'Pushpa Pushpa', artistName: 'Devi Sri Prasad, Nakash Aziz', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/bb/12/7ebb12e6-76dd-d922-263a-bbce5d8c3fb9/886449231840.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 107, trackName: 'Sooseki', artistName: 'Devi Sri Prasad, Shreya Ghoshal', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/bb/12/7ebb12e6-76dd-d922-263a-bbce5d8c3fb9/886449231840.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 108, trackName: 'Ramuloo Ramulaa', artistName: 'Thaman S, Anurag Kulkarni', collectionName: 'Ala Vaikunthapurramuloo', artworkUrl100: 'https://c.saavncdn.com/267/Ala-Vaikunthapurramuloo-Telugu-2019-20200111162332-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 109, trackName: 'Naatu Naatu', artistName: 'M.M. Keeravani, Rahul Sipligunj', collectionName: 'RRR', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/91/9d/28/919d28e7-c6ee-d0b8-c30c-2a5433ce8538/886449120786.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 110, trackName: 'Oo Antava Mawa', artistName: 'Devi Sri Prasad, Indravathi Chauhan', collectionName: 'Pushpa The Rise', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/bb/12/7ebb12e6-76dd-d922-263a-bbce5d8c3fb9/886449231840.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 111, trackName: 'Srivalli', artistName: 'Devi Sri Prasad, Sid Sriram', collectionName: 'Pushpa The Rise', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/bb/12/7ebb12e6-76dd-d922-263a-bbce5d8c3fb9/886449231840.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 112, trackName: 'Inkem Inkem Inkem Kaavale', artistName: 'Gopi Sundar, Sid Sriram', collectionName: 'Geetha Govindam', artworkUrl100: 'https://c.saavncdn.com/269/Hi-Nanna-Telugu-2023-20231124174006-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 113, trackName: 'Butta Bomma', artistName: 'Thaman S, Armaan Malik', collectionName: 'Ala Vaikunthapurramuloo', artworkUrl100: 'https://c.saavncdn.com/267/Ala-Vaikunthapurramuloo-Telugu-2019-20200111162332-500x500.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 114, trackName: 'Nee Kannu Neeli Samudram', artistName: 'Devi Sri Prasad, Javed Ali', collectionName: 'Uppena', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+  { trackId: 115, trackName: 'Odiyamma', artistName: 'Hesham Abdul Wahab, Vishal Mishra', collectionName: 'Hi Nanna', artworkUrl100: 'https://c.saavncdn.com/269/Hi-Nanna-Telugu-2023-20231124174006-500x500.jpg', primaryGenreName: 'Telugu' }
+];
+
 const DEFAULT_PLAYLISTS = [
-  { id: 'liked', title: 'Liked Songs', queryTag: 'Telugu Hits', gradient: 'linear-gradient(135deg, #ec4899, #ff2d55)', icon: 'heart' },
-  { id: 'telugu-hits', title: 'Telugu Superhits', queryTag: 'Telugu Hits', gradient: 'linear-gradient(135deg, #f97316, #eab308)', icon: 'flame' },
-  { id: 'tamil-hits', title: 'Tamil Explosive Hits', queryTag: 'Tamil Hits', gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)', icon: 'zap' },
-  { id: 'anirudh-beats', title: 'Anirudh Beats', queryTag: 'Anirudh Ravichander', gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)', icon: 'radio' },
-  { id: 'ar-rahman', title: 'A.R. Rahman Magic', queryTag: 'A.R. Rahman', gradient: 'linear-gradient(135deg, #06b6d4, #3b82f6)', icon: 'sparkles' },
-  { id: 'sid-sriram', title: 'Sid Sriram Melodies', queryTag: 'Sid Sriram', gradient: 'linear-gradient(135deg, #10b981, #059669)', icon: 'music' },
-  { id: 'dsp-hits', title: 'DSP Energy Hits', queryTag: 'Devi Sri Prasad', gradient: 'linear-gradient(135deg, #f43f5e, #fb923c)', icon: 'flame' },
-  { id: 'global-top', title: 'Global Top 50', queryTag: 'Coldplay', gradient: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', icon: 'disc' }
+  { id: 'liked', title: 'Liked Songs', queryTag: 'Telugu Hits', gradient: 'linear-gradient(135deg, #ec4899, #ff2d55)', icon: 'heart', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'telugu-hits', title: 'Telugu Superhits', queryTag: 'Telugu Hits', gradient: 'linear-gradient(135deg, #f97316, #eab308)', icon: 'flame', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'tamil-hits', title: 'Tamil Explosive Hits', queryTag: 'Tamil Hits', gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)', icon: 'zap', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'anirudh-beats', title: 'Anirudh Beats', queryTag: 'Anirudh Ravichander', gradient: 'linear-gradient(135deg, #ef4444, #b91c1c)', icon: 'radio', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'ar-rahman', title: 'A.R. Rahman Magic', queryTag: 'A.R. Rahman', gradient: 'linear-gradient(135deg, #06b6d4, #3b82f6)', icon: 'sparkles', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'sid-sriram', title: 'Sid Sriram Melodies', queryTag: 'Sid Sriram', gradient: 'linear-gradient(135deg, #10b981, #059669)', icon: 'music', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'dsp-hits', title: 'DSP Energy Hits', queryTag: 'Devi Sri Prasad', gradient: 'linear-gradient(135deg, #f43f5e, #fb923c)', icon: 'flame', tracks: INSTANT_TELUGU_TRACKS },
+  { id: 'global-top', title: 'Global Top 50', queryTag: 'Coldplay', gradient: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', icon: 'disc', tracks: INSTANT_TELUGU_TRACKS }
 ];
 
 function SearchPage() {

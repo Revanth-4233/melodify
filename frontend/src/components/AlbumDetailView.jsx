@@ -392,38 +392,43 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
         try {
           const jioUrls = [
             `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(primaryQ)}`,
-            `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&p=2&n=50&q=${encodeURIComponent(primaryQ)}`,
-            `/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(primaryQ)}`
+            `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&p=2&n=50&q=${encodeURIComponent(primaryQ)}`
           ];
 
-          const jioPromises = jioUrls.map(u => fetch(u, { signal: AbortSignal.timeout(6000) }).then(r => r.json()).catch(() => null));
-          const jioResArr = await Promise.all(jioPromises);
-          for (const jioData of jioResArr) {
-            const rawResults = jioData?.results;
-            if (Array.isArray(rawResults)) {
-              for (let i = 0; i < rawResults.length; i++) {
-                const item = rawResults[i];
-                if (!item || !item.song) continue;
-                const tName = decodeEntities(item.song);
-                const aName = decodeEntities(item.primary_artists || item.singers || 'Various Artists');
-                const cName = decodeEntities(item.album || title);
-                const artUrl = item.image ? item.image.replace('150x150', '500x500') : '';
-                const durMs = item.duration ? parseInt(item.duration, 10) * 1000 : 210000;
-                addTrack({
-                  trackId: item.id || (900000 + i * 13),
-                  appleCatalogId: item.id || (900000 + i * 13),
-                  trackName: tName,
-                  artistName: aName,
-                  collectionName: cName,
-                  artworkUrl100: artUrl,
-                  artworkUrl60: artUrl,
-                  previewUrl: item.media_preview_url || '',
-                  encrypted_media_url: item.encrypted_media_url || '',
-                  trackTimeMillis: durMs,
-                  primaryGenreName: genre,
-                  releaseDate: item.year || releaseDate
-                });
+          for (const u of jioUrls) {
+            try {
+              const res = await fetch(u, { signal: AbortSignal.timeout(2500) });
+              if (!res.ok) continue;
+              const jioData = await res.json();
+              const rawResults = jioData?.results;
+              if (Array.isArray(rawResults) && rawResults.length > 0) {
+                for (let i = 0; i < rawResults.length; i++) {
+                  const item = rawResults[i];
+                  if (!item || !item.song) continue;
+                  const tName = decodeEntities(item.song);
+                  const aName = decodeEntities(item.primary_artists || item.singers || 'Various Artists');
+                  const cName = decodeEntities(item.album || title);
+                  const artUrl = item.image ? item.image.replace('150x150', '500x500') : '';
+                  const durMs = item.duration ? parseInt(item.duration, 10) * 1000 : 210000;
+                  addTrack({
+                    trackId: item.id || (900000 + i * 13),
+                    appleCatalogId: item.id || (900000 + i * 13),
+                    trackName: tName,
+                    artistName: aName,
+                    collectionName: cName,
+                    artworkUrl100: artUrl,
+                    artworkUrl60: artUrl,
+                    previewUrl: item.media_preview_url || '',
+                    encrypted_media_url: item.encrypted_media_url || '',
+                    trackTimeMillis: durMs,
+                    primaryGenreName: genre,
+                    releaseDate: item.year || releaseDate
+                  });
+                }
+                setTracks([...combined]); // Immediately update UI!
               }
+            } catch (e) {
+              // skip failed endpoint
             }
           }
         } catch (e) {
