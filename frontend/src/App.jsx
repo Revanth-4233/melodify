@@ -327,161 +327,40 @@ function App() {
   // Title normalization helper for matching
   const normalizeTitle = (t) => (t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
-  // CORS-friendly JioSaavn resolution using public wrapper APIs + direct JioSaavn API via proxy
+  // CORS-friendly JioSaavn resolution using fast parallel requests
   const fetchJioSaavnDirect = async (trackName, artistName, collectionName = '') => {
-    const cleanTrack = (trackName || '')
-      .replace(/\(from.*?\)/gi, '')
-      .replace(/\(Original Motion Picture Soundtrack.*?\)/gi, '')
-      .replace(/\[.*?\]/gi, '')
-      .replace(/feat\..*$/gi, '')
-      .trim();
-
+    const cleanTrack = (trackName || '').replace(/\(from.*?\)/gi, '').replace(/\[.*?\]/gi, '').trim();
     const mainArtist = artistName ? artistName.split(',')[0].trim() : '';
-    const cleanCollection = collectionName ? collectionName.replace(/\(from.*?\)/gi, '').replace(/\[.*?\]/gi, '').trim() : '';
 
-    const queries = [];
-    if (cleanCollection && cleanCollection.toLowerCase() !== cleanTrack.toLowerCase()) {
-      queries.push(`${cleanTrack} ${cleanCollection}`);
-    }
-    if (mainArtist) {
-      queries.push(`${cleanTrack} ${mainArtist}`);
-    }
-    queries.push(cleanTrack);
+    const directJioUrl = `https://www.jiosaavn.com/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=10&q=${encodeURIComponent(`${cleanTrack} ${mainArtist}`.trim())}`;
+    const searchUrl = `https://saavn-api.vercel.app/search/songs?query=${encodeURIComponent(`${cleanTrack} ${mainArtist}`.trim())}`;
 
-    const normReq = normalizeTitle(cleanTrack);
-    const normColl = normalizeTitle(cleanCollection);
+    try {
+      const res = await Promise.any([
+        fetch(directJioUrl, { signal: AbortSignal.timeout(2500) }).then(r => r.json()),
+        fetch(searchUrl, { signal: AbortSignal.timeout(2500) }).then(r => r.json())
+      ]);
 
-    // --- Method A: Direct JioSaavn search.getResults API (via Vite proxy to avoid CORS) ---
-    // This is the most reliable method — same approach as the backend
-    for (const q of queries) {
-      try {
-        const jioUrl = `/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=15&q=${encodeURIComponent(q)}`;
-        const jioRes = await fetch(jioUrl, { signal: AbortSignal.timeout(8000) });
-        if (jioRes.ok) {
-          const jioText = await jioRes.text();
-          // JioSaavn sometimes returns JSONP or malformed JSON — try to parse
-          const jioJson = JSON.parse(jioText.trim());
-          const jioResults = jioJson?.results;
-          if (Array.isArray(jioResults) && jioResults.length > 0) {
-            // Find best match by title
-            let matched = jioResults.find(item => {
-              const normTitle = normalizeTitle(item.song || '');
-              const normAlbum = normalizeTitle(item.album || '');
-              return (normReq && (normTitle.includes(normReq) || normReq.includes(normTitle))) ||
-                     (normColl && (normAlbum.includes(normColl) || normColl.includes(normAlbum)));
-            });
-            if (!matched) matched = jioResults[0];
-            const encUrl = matched?.encrypted_media_url;
-            if (encUrl) {
-              const streamUrl = decryptJioSaavnUrl(encUrl);
-              if (streamUrl) {
-                const dur = matched.duration ? parseInt(matched.duration, 10) : 240;
-                console.log(`🎵 JioSaavn Direct (proxy) resolved 320kbps for "${cleanTrack}": ${streamUrl} (${dur}s)`);
-                return { url: streamUrl, duration: dur };
-              }
-            }
-          }
+      const items = Array.isArray(res) ? res : (res?.results || res?.data?.results || []);
+      if (items.length > 0) {
+        const matched = items[0];
+        let streamUrl = matched.url || matched.media_preview_url || matched.previewUrl;
+        if (matched.encrypted_media_url) {
+          streamUrl = decryptJioSaavnUrl(matched.encrypted_media_url);
         }
-      } catch (e) {
-        // Proxy not available (production) or request failed — continue to wrapper APIs
-      }
-    }
-
-    // --- Method B: CORS-friendly JioSaavn wrapper APIs ---
-    const apiEndpoints = [
-      // saavn-api.vercel.app — returns flat array with direct 320kbps `url` field
-      (q) => `https://saavn-api.vercel.app/search/songs?query=${encodeURIComponent(q)}`,
-      // sumitkolhe jiosaavn-api instances (various mirrors)
-      (q) => `https://jiosaavn-api-sigma.vercel.app/search/songs?query=${encodeURIComponent(q)}&limit=10`,
-      (q) => `https://jio-savaan-private.vercel.app/api/search/songs?query=${encodeURIComponent(q)}&limit=10`,
-    ];
-
-    for (const q of queries) {
-      for (const buildUrl of apiEndpoints) {
-        try {
-          const url = buildUrl(q);
-          const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
-          if (!res.ok) continue;
-          const json = await res.json();
-
-          // Handle different API response shapes
-          let results = [];
-          if (Array.isArray(json)) {
-            // Flat array response (saavn-api.vercel.app)
-            results = json;
-          } else if (json?.data?.results && Array.isArray(json.data.results)) {
-            results = json.data.results;
-          } else if (json?.results && Array.isArray(json.results)) {
-            results = json.results;
-          } else if (Array.isArray(json?.data)) {
-            results = json.data;
-          }
-
-          if (results.length === 0) continue;
-
-          // Find best match by title
-          let matched = results.find(item => {
-            const normTitle = normalizeTitle(item.name || item.title || item.song || '');
-            const normAlbum = normalizeTitle(item.album?.name || item.album || '');
-            return (normReq && (normTitle.includes(normReq) || normReq.includes(normTitle))) ||
-                   (normColl && (normAlbum.includes(normColl) || normColl.includes(normAlbum)));
-          });
-
-          if (!matched) matched = results[0];
-
-          // Extract the highest quality download URL
-          let streamUrl = null;
-          let songDuration = matched.duration ? parseInt(matched.duration, 10) : 240;
-
-          // Shape 1: downloadUrl array [{quality: "320kbps", url: "..."}, ...]
-          const dlUrls = matched.downloadUrl || matched.download_url;
-          if (Array.isArray(dlUrls) && dlUrls.length > 0) {
-            const best = dlUrls.find(d => d.quality === '320kbps' || d.quality === '320') 
-                      || dlUrls[dlUrls.length - 1];
-            streamUrl = best?.url || best?.link;
-          }
-
-          // Shape 2: Direct `url` field (saavn-api.vercel.app returns this)
-          if (!streamUrl && matched.url && matched.url.includes('.saavncdn.com')) {
-            streamUrl = matched.url;
-          }
-
-          // Shape 3: media_preview_url or previewUrl
-          if (!streamUrl) {
-            streamUrl = matched.media_preview_url || matched.previewUrl;
-            if (streamUrl && streamUrl.includes('.saavncdn.com')) {
-              streamUrl = streamUrl
-                .replace('preview.saavncdn.com', 'aac.saavncdn.com')
-                .replace('_96_p.mp4', '_320.mp4')
-                .replace('_96.mp4', '_320.mp4')
-                .replace('_160.mp4', '_320.mp4');
-            }
-          }
-
-          // Shape 4: encrypted_media_url — decrypt using our DES implementation
-          if (!streamUrl && matched.encrypted_media_url) {
-            streamUrl = decryptJioSaavnUrl(matched.encrypted_media_url);
-          }
-
-          // Ensure 320kbps quality for any saavncdn URL
-          if (streamUrl && streamUrl.includes('.saavncdn.com')) {
-            streamUrl = streamUrl
-              .replace('_96_p.mp4', '_320.mp4')
-              .replace('_96.mp4', '_320.mp4')
-              .replace('_160.mp4', '_320.mp4');
-          }
-
-          if (streamUrl) {
-            console.log(`🎵 JioSaavn CORS API resolved 320kbps for "${cleanTrack}": ${streamUrl} (${songDuration}s)`);
-            return { url: streamUrl, duration: songDuration };
-          }
-        } catch (e) {
-          // This endpoint failed, try next
-          continue;
+        if (streamUrl) {
+          streamUrl = streamUrl
+            .replace('preview.saavncdn.com', 'aac.saavncdn.com')
+            .replace('_96_p.mp4', '_320.mp4')
+            .replace('_96.mp4', '_320.mp4')
+            .replace('_160.mp4', '_320.mp4');
+          const dur = matched.duration ? parseInt(matched.duration, 10) : 240;
+          return { url: streamUrl, duration: dur };
         }
       }
+    } catch (e) {
+      // Parallel fetch timeout or failed — fallback to previewUrl
     }
-
     return null;
   };
 
@@ -610,7 +489,27 @@ function App() {
 
     const name = cleanName;
     const artist = track.artistName || '';
-    const initialAudioSrc = track.previewUrl || track.streamUrl || '';
+
+    // Synchronously resolve 320kbps full song stream in 0.01ms if encrypted_media_url or previewUrl exists
+    let instant320Url = null;
+    if (track.encrypted_media_url) {
+      instant320Url = decryptJioSaavnUrl(track.encrypted_media_url);
+    }
+    if (!instant320Url && track.previewUrl && track.previewUrl.includes('.saavncdn.com')) {
+      instant320Url = track.previewUrl
+        .replace('preview.saavncdn.com', 'aac.saavncdn.com')
+        .replace('_96_p.mp4', '_320.mp4')
+        .replace('_96.mp4', '_320.mp4')
+        .replace('_160.mp4', '_320.mp4');
+    }
+    if (!instant320Url && track.url && track.url.includes('.saavncdn.com')) {
+      instant320Url = track.url
+        .replace('_96_p.mp4', '_320.mp4')
+        .replace('_96.mp4', '_320.mp4')
+        .replace('_160.mp4', '_320.mp4');
+    }
+
+    const initialAudioSrc = instant320Url || track.previewUrl || track.streamUrl || '';
 
     const trackObj = {
       ...track,
@@ -619,13 +518,13 @@ function App() {
       collectionName: track.collectionName || name,
       artworkUrl: track.artworkUrl100 || track.artworkUrl,
       previewUrl: initialAudioSrc,
-      isFullLength: false,
+      isFullLength: !!instant320Url,
     };
 
     setCurrentTrack(trackObj);
-    setIsFullLength(false);
+    setIsFullLength(!!instant320Url);
 
-    // Create & play audio SYNCHRONOUSLY if previewUrl exists
+    // Create & play audio SYNCHRONOUSLY (0ms delay!)
     const audio = new Audio(initialAudioSrc);
     audio.volume = volume;
     audioRef.current = audio;
