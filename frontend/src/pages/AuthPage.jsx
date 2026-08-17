@@ -16,6 +16,8 @@ function GoogleIcon() {
 
 function AuthPage({ onClose }) {
   const [view, setView] = useState('welcome'); // 'welcome', 'login', 'register'
+  const [showGooglePrompt, setShowGooglePrompt] = useState(false);
+  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const { handleLogin } = useAuth();
   const { addToast } = useToast();
@@ -24,24 +26,27 @@ function AuthPage({ onClose }) {
     username: '', email: '', password: ''
   });
 
-  const handleGoogleAuth = () => {
+  const selectGoogleAccount = (email, name) => {
     setLoading(true);
-    setTimeout(() => {
-      const googleUser = {
-        token: 'google_jwt_token_' + Date.now(),
-        user: {
-          id: 9999,
-          username: 'Google User',
-          email: formData.email || 'user.google@gmail.com',
-          preferredLanguages: 'Telugu,Tamil',
-          preferredArtists: 'Anirudh Ravichander,Sid Sriram'
-        }
-      };
-      handleLogin(googleUser);
-      addToast('Signed in with Google! Welcome to AuraMusic 🎵', 'success');
-      if (onClose) onClose();
-      setLoading(false);
-    }, 400);
+    const username = name || email.split('@')[0];
+    const googleUser = {
+      token: 'google_jwt_token_' + Date.now(),
+      user: {
+        id: Math.floor(1000 + Math.random() * 9000),
+        username: username,
+        email: email,
+        preferredLanguages: 'Telugu,Tamil',
+        preferredArtists: 'Anirudh Ravichander,Sid Sriram'
+      }
+    };
+    handleLogin(googleUser);
+    addToast(`Signed in with Google as ${email}! Welcome to AuraMusic 🎵`, 'success');
+    if (onClose) onClose();
+    setLoading(false);
+  };
+
+  const handleGoogleAuth = () => {
+    setShowGooglePrompt(true);
   };
 
   const handleSubmit = async (e) => {
@@ -97,6 +102,72 @@ function AuthPage({ onClose }) {
       setLoading(false);
     }
   };
+
+  if (showGooglePrompt) {
+    return (
+      <div className="auth-mobile-container" style={{ padding: '24px', maxWidth: '420px', margin: '0 auto', background: '#181818', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 20px 50px rgba(0,0,0,0.9)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+          <GoogleIcon />
+          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#fff', margin: 0 }}>Sign in with Google</h2>
+        </div>
+        <p style={{ color: '#b3b3b3', fontSize: '0.88rem', marginBottom: '20px' }}>Choose an account to continue to <strong>AuraMusic</strong>:</p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+          <button
+            onClick={() => selectGoogleAccount('mukes.revanth@gmail.com', 'Mukesh Revanth')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#4285F4', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>M</div>
+            <div>
+              <div style={{ color: '#fff', fontWeight: '700', fontSize: '0.92rem' }}>Mukesh Revanth</div>
+              <div style={{ color: '#888', fontSize: '0.8rem' }}>mukes.revanth@gmail.com</div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => selectGoogleAccount('revanth.music@gmail.com', 'Revanth Music')}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '12px', cursor: 'pointer', textAlign: 'left' }}
+          >
+            <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#EA4335', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>R</div>
+            <div>
+              <div style={{ color: '#fff', fontWeight: '700', fontSize: '0.92rem' }}>Revanth Music</div>
+              <div style={{ color: '#888', fontSize: '0.8rem' }}>revanth.music@gmail.com</div>
+            </div>
+          </button>
+        </div>
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '16px', marginBottom: '16px' }}>
+          <label style={{ display: 'block', fontSize: '0.8rem', color: '#aaa', marginBottom: '6px', fontWeight: 600 }}>Or type your Google email:</label>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <input
+              type="email"
+              placeholder="your.name@gmail.com"
+              value={customGoogleEmail}
+              onChange={(e) => setCustomGoogleEmail(e.target.value)}
+              style={{ flex: 1, padding: '10px 14px', borderRadius: '8px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', outline: 'none', fontSize: '0.9rem' }}
+            />
+            <button
+              onClick={() => {
+                if (customGoogleEmail.trim()) {
+                  selectGoogleAccount(customGoogleEmail.trim(), customGoogleEmail.split('@')[0]);
+                }
+              }}
+              style={{ padding: '10px 16px', borderRadius: '8px', background: '#4285F4', color: '#fff', border: 'none', fontWeight: 700, cursor: 'pointer' }}
+            >
+              Sign In
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setShowGooglePrompt(false)}
+          style={{ width: '100%', background: 'transparent', border: 'none', color: '#888', padding: '8px', fontSize: '0.85rem', cursor: 'pointer' }}
+        >
+          ← Cancel
+        </button>
+      </div>
+    );
+  }
 
   if (view === 'welcome') {
     return (
