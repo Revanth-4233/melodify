@@ -544,18 +544,19 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
 
   return (
     <div className="spotify-album-page-view fade-in">
+      {/* Top Header Navigation Bar */}
+      <div className="album-view-nav-header" style={{ padding: '16px 24px', display: 'flex', alignItems: 'center', zIndex: 10 }}>
+        <button
+          className="btn btn-secondary btn-sm"
+          onClick={onClose}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '50px', background: 'rgba(255,255,255,0.1)', border: 'none', color: '#fff', padding: '8px 18px', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', backdropFilter: 'blur(10px)' }}
+        >
+          <ArrowLeft size={16} /> Back
+        </button>
+      </div>
+
       {/* Album Hero Header Banner */}
-      <div className="album-hero-banner" style={{ position: 'relative' }}>
-        {/* Top Header Navigation */}
-        <div style={{ position: 'absolute', top: '24px', left: '32px' }}>
-          <button
-            className="btn btn-secondary btn-sm"
-            onClick={onClose}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '50px', background: 'rgba(0,0,0,0.5)', border: 'none', color: '#fff', padding: '6px 14px', cursor: 'pointer' }}
-          >
-            <ArrowLeft size={16} /> Back
-          </button>
-        </div>
+      <div className="album-hero-banner">
 
         <div className="album-hero-artwork-wrapper">
           {title === 'Liked Songs' ? (
