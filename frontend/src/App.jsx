@@ -140,10 +140,24 @@ function App() {
   const [showJamModal, setShowJamModal] = useState(false);
 
   const handleLogin = (data) => {
-    localStorage.setItem('token', data.token);
-    setUser(data);
+    if (!data) return;
+    const token = data.token || 'aura_jwt_' + Date.now();
+    const userObj = data.user || data;
+
+    const normalizedUser = {
+      ...userObj,
+      token,
+      username: userObj.username || userObj.fullName || userObj.email?.split('@')[0] || 'Aura User',
+      email: userObj.email || 'user@auramusic.com',
+      preferredLanguages: userObj.preferredLanguages || 'Telugu,Tamil',
+      preferredArtists: userObj.preferredArtists || 'Anirudh Ravichander,A.R. Rahman,Devi Sri Prasad'
+    };
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('aura_user', JSON.stringify(normalizedUser));
+    setUser(normalizedUser);
     setShowAuth(false);
-    addToast(`Welcome back, ${data.username}!`, 'success');
+    addToast(`Welcome, ${normalizedUser.username}! 🚀`, 'success');
   };
 
   const handleLogout = () => {
