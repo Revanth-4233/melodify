@@ -11,7 +11,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: PORT
-        value: 8080
+        value: "8080"
       - key: NODE_ENV
         value: production
 
@@ -32,10 +32,6 @@ services:
         source: /*
         destination: /index.html
 
-databases:
-  - name: melodify-db
-    plan: free
-    region: oregon
 
 
 
