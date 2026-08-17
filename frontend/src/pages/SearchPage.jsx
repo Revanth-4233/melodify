@@ -140,7 +140,7 @@ function SearchPage() {
   
   const { user } = useAuth();
   const { addToast } = useToast();
-  const { playTrack } = usePlayer();
+  const { playTrack, currentTrack, isPlaying } = usePlayer();
   const debounceRef = useRef(null);
   const searchCacheRef = useRef({});
 
@@ -544,15 +544,27 @@ function SearchPage() {
                   backendTracks: item.tracks
                 };
                 
+                const isPlayingThisAlbum = isPlaying && currentTrack && (
+                  (currentTrack.collectionName && currentTrack.collectionName.toLowerCase().includes(item.title.toLowerCase())) ||
+                  (item.title && currentTrack.collectionName && item.title.toLowerCase().includes(currentTrack.collectionName.toLowerCase())) ||
+                  (item.title === 'Liked Songs' && (currentTrack.collectionName === 'Liked Songs' || currentTrack.isLiked))
+                );
+
                 return (
                   <div 
                     key={'grid-' + index} 
-                    className="spotify-home-grid-card"
+                    className={`spotify-home-grid-card ${isPlayingThisAlbum ? 'active-playing-card' : ''}`}
                     onClick={() => {
                       setPlayerModalAlbum({
                         ...displayAlbum,
                         backendTracks: item.tracks || []
                       });
+                    }}
+                    style={{
+                      border: isPlayingThisAlbum ? '2px solid #00e5ff' : '1px solid rgba(255,255,255,0.06)',
+                      boxShadow: isPlayingThisAlbum ? '0 0 20px rgba(0, 229, 255, 0.45)' : undefined,
+                      background: isPlayingThisAlbum ? 'rgba(0, 229, 255, 0.12)' : undefined,
+                      transition: 'all 0.2s ease'
                     }}
                   >
                     <div style={{ 
@@ -585,7 +597,14 @@ function SearchPage() {
                         <Disc size={20} color="#fff" />
                       )}
                     </div>
-                    <span className="title" title={item.title} style={{ fontWeight: 700, fontSize: '0.88rem', paddingLeft: '10px', paddingRight: '6px' }}>{item.title}</span>
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingLeft: '10px', paddingRight: '8px', overflow: 'hidden' }}>
+                      <span className="title" title={item.title} style={{ fontWeight: 700, fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: isPlayingThisAlbum ? '#00e5ff' : '#fff' }}>{item.title}</span>
+                      {isPlayingThisAlbum && (
+                        <span style={{ background: '#00e5ff', color: '#000', fontSize: '0.6rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
+                          PLAYING ▶
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               }) : <div style={{ padding: '20px', color: '#b3b3b3' }}>No playlists generated yet. The backend scheduled tasks will populate these.</div>}
