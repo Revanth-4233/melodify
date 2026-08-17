@@ -191,6 +191,11 @@ function BottomPlayerBar() {
             </div>
             <div className="player-track-artist">
               <span>{activeTrack.artistName}</span>
+              {movieName && (
+                <span className="playing-from-album-tag" style={{ fontSize: '0.7rem', color: '#00e5ff', background: 'rgba(0, 229, 255, 0.12)', padding: '2px 8px', borderRadius: '12px', marginLeft: '6px', fontWeight: 600, border: '1px solid rgba(0, 229, 255, 0.25)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden', maxWidth: '140px', display: 'inline-block', verticalAlign: 'middle' }}>
+                  From: {movieName}
+                </span>
+              )}
               {isFullLength && (
                 <span className="full-song-badge">
                   FULL SONG

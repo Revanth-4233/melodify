@@ -41,53 +41,7 @@ function SafeImage({ src, alt, className, style }) {
   );
 }
 
-const CURATED_PLAYLIST_TRACKS = {
-  'Trending Telugu Songs 2026': [],
-  'Telugu Superhits': [
-    { trackId: 5001, appleCatalogId: 5001, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab, Anurag Kulkarni', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/28/31/3b/28313b5e-436f-b258-0056-bb6b06385a49/mzaf_10486001083980315354.plus.aac.p.m4a', trackTimeMillis: 242000, primaryGenreName: 'Telugu' },
-    { trackId: 5002, appleCatalogId: 5002, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S, Sri Krishna', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/03/95/c3/0395c3a4-368a-3aa5-06f8-f9e0ebd553a4/mzaf_1960951393962288235.plus.aac.p.m4a', trackTimeMillis: 215000, primaryGenreName: 'Telugu' },
-    { trackId: 5003, appleCatalogId: 5003, trackName: 'Ramuloo Ramulaa', artistName: 'Thaman S, Anurag Kulkarni', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/4d/7c/4a/4d7c4a33-0c3b-b0e5-1e5a-8182d9a25811/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview113/v4/b8/47/4d/b8474d28-3e5a-cd43-7f13-68d76536338a/mzaf_8435165426177579624.plus.aac.p.m4a', trackTimeMillis: 234000, primaryGenreName: 'Telugu' },
-    { trackId: 5004, appleCatalogId: 5004, trackName: 'Inkem Inkem Inkem Kaavale', artistName: 'Sid Sriram, Gopi Sundar', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music124/v4/68/f1/52/68f1523b-3c40-f2cc-7d4a-376642897adb/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/21/04/0c/21040ce2-1133-c820-251a-7b3b9b470001/mzaf_2479410141673898124.plus.aac.p.m4a', trackTimeMillis: 267000, primaryGenreName: 'Telugu' },
-    { trackId: 5005, appleCatalogId: 5005, trackName: 'Oo Antava Mava..Oo Oo Antava', artistName: 'Indravathi Chauhan, DSP', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/31/53/78/3153782d-1577-ffc2-8418-e3cf14a1e9df/mzaf_4728562184918731531.plus.aac.p.m4a', trackTimeMillis: 223000, primaryGenreName: 'Telugu' },
-    { trackId: 5006, appleCatalogId: 5006, trackName: 'Chuttamalle', artistName: 'Shilpa Rao, Anirudh Ravichander', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/4a/12/1c/4a121cb5-bf99-90dd-54df-eb1bfa3c6bb2/mzaf_1350699222564758712.plus.aac.p.m4a', trackTimeMillis: 218000, primaryGenreName: 'Telugu' },
-    { trackId: 5007, appleCatalogId: 5007, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/4a/12/1c/4a121cb5-bf99-90dd-54df-eb1bfa3c6bb2/mzaf_1350699222564758712.plus.aac.p.m4a', trackTimeMillis: 198000, primaryGenreName: 'Telugu' },
-    { trackId: 5008, appleCatalogId: 5008, trackName: 'Srivalli', artistName: 'Sid Sriram, DSP', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/31/53/78/3153782d-1577-ffc2-8418-e3cf14a1e9df/mzaf_4728562184918731531.plus.aac.p.m4a', trackTimeMillis: 220000, primaryGenreName: 'Telugu' },
-    { trackId: 5009, appleCatalogId: 5009, trackName: 'Pushpa Pushpa', artistName: 'Nakash Aziz, DSP', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/31/53/78/3153782d-1577-ffc2-8418-e3cf14a1e9df/mzaf_4728562184918731531.plus.aac.p.m4a', trackTimeMillis: 245000, primaryGenreName: 'Telugu' },
-    { trackId: 5010, appleCatalogId: 5010, trackName: 'Jaragandi', artistName: 'Daler Mehndi, Sunidhi Chauhan', collectionName: 'Telugu Superhits', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/28/31/3b/28313b5e-436f-b258-0056-bb6b06385a49/mzaf_10486001083980315354.plus.aac.p.m4a', trackTimeMillis: 260000, primaryGenreName: 'Telugu' }
-  ],
-  'Hi Nanna': [
-    { trackId: 5001, appleCatalogId: 5001, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab, Anurag Kulkarni', collectionName: 'Hi Nanna', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/28/31/3b/28313b5e-436f-b258-0056-bb6b06385a49/mzaf_10486001083980315354.plus.aac.p.m4a', trackTimeMillis: 242000, primaryGenreName: 'Telugu' },
-    { trackId: 5011, appleCatalogId: 5011, trackName: 'Ammaadi', artistName: 'Kaala Bhairava, Shakthisree Gopalan', collectionName: 'Hi Nanna', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 235000, primaryGenreName: 'Telugu' },
-    { trackId: 5012, appleCatalogId: 5012, trackName: 'Odiyamma', artistName: 'Dhruv Vikram, Shruti Haasan', collectionName: 'Hi Nanna', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 210000, primaryGenreName: 'Telugu' },
-    { trackId: 5013, appleCatalogId: 5013, trackName: 'Chedhu Nijam', artistName: 'Hesham Abdul Wahab', collectionName: 'Hi Nanna', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 198000, primaryGenreName: 'Telugu' },
-    { trackId: 5014, appleCatalogId: 5014, trackName: 'Asalelaa', artistName: 'Hesham Abdul Wahab, Chinmayi', collectionName: 'Hi Nanna', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 228000, primaryGenreName: 'Telugu' },
-    { trackId: 5015, appleCatalogId: 5015, trackName: 'Needhe Needhe', artistName: 'Hesham Abdul Wahab', collectionName: 'Hi Nanna', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/64/4c/1d/644c1db5-68f8-0640-21e2-dd440f7290e7/8903431963253_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 205000, primaryGenreName: 'Telugu' }
-  ],
-  'Pushpa 2 The Rule': [
-    { trackId: 7001, appleCatalogId: 7001, trackName: 'Pushpa Pushpa', artistName: 'Nakash Aziz, DSP', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview116/v4/31/53/78/3153782d-1577-ffc2-8418-e3cf14a1e9df/mzaf_4728562184918731531.plus.aac.p.m4a', trackTimeMillis: 245000, primaryGenreName: 'Telugu' },
-    { trackId: 7011, appleCatalogId: 7011, trackName: 'Angaaron (The Couple Song)', artistName: 'Shreya Ghoshal, DSP', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 230000, primaryGenreName: 'Telugu' },
-    { trackId: 7012, appleCatalogId: 7012, trackName: 'Peelings', artistName: 'DSP, Jaspreet Jasz', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 215000, primaryGenreName: 'Telugu' },
-    { trackId: 7013, appleCatalogId: 7013, trackName: 'Kissik', artistName: 'Sreeleela, DSP, Sublahshini', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 240000, primaryGenreName: 'Telugu' },
-    { trackId: 7014, appleCatalogId: 7014, trackName: 'Jaatara Theme', artistName: 'DSP', collectionName: 'Pushpa 2 The Rule', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/59/19/65/591965d4-84b4-d62d-345f-88bd29ce0843/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 190000, primaryGenreName: 'Telugu' }
-  ],
-  'Devara Part 1': [
-    { trackId: 6001, appleCatalogId: 6001, trackName: 'Chuttamalle', artistName: 'Shilpa Rao, Anirudh Ravichander', collectionName: 'Devara Part 1', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/4a/12/1c/4a121cb5-bf99-90dd-54df-eb1bfa3c6bb2/mzaf_1350699222564758712.plus.aac.p.m4a', trackTimeMillis: 218000, primaryGenreName: 'Telugu' },
-    { trackId: 6005, appleCatalogId: 6005, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: 'Devara Part 1', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/4a/12/1c/4a121cb5-bf99-90dd-54df-eb1bfa3c6bb2/mzaf_1350699222564758712.plus.aac.p.m4a', trackTimeMillis: 198000, primaryGenreName: 'Telugu' },
-    { trackId: 6011, appleCatalogId: 6011, trackName: 'Daavudi', artistName: 'Nakash Aziz, Akasa, Anirudh', collectionName: 'Devara Part 1', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 225000, primaryGenreName: 'Telugu' },
-    { trackId: 6012, appleCatalogId: 6012, trackName: 'Ayudha Pooja', artistName: 'Anirudh Ravichander', collectionName: 'Devara Part 1', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 205000, primaryGenreName: 'Telugu' }
-  ],
-  'Guntur Kaaram': [
-    { trackId: 5002, appleCatalogId: 5002, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S, Sri Krishna', collectionName: 'Guntur Kaaram', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/300x300bb.jpg', previewUrl: 'https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview126/v4/03/95/c3/0395c3a4-368a-3aa5-06f8-f9e0ebd553a4/mzaf_1960951393962288235.plus.aac.p.m4a', trackTimeMillis: 215000, primaryGenreName: 'Telugu' },
-    { trackId: 5021, appleCatalogId: 5021, trackName: 'Dum Masala', artistName: 'Sanjith Hegde, Thaman S', collectionName: 'Guntur Kaaram', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 210000, primaryGenreName: 'Telugu' },
-    { trackId: 5022, appleCatalogId: 5022, trackName: 'Oh My Baby', artistName: 'Shilpa Rao, Thaman S', collectionName: 'Guntur Kaaram', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 195000, primaryGenreName: 'Telugu' },
-    { trackId: 5023, appleCatalogId: 5023, trackName: 'Mawaa Enthaina', artistName: 'Thaman S, Ram Miriyala', collectionName: 'Guntur Kaaram', artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/300x300bb.jpg', previewUrl: '', trackTimeMillis: 220000, primaryGenreName: 'Telugu' }
-  ]
-};
-
-// Map alias names
-CURATED_PLAYLIST_TRACKS['🔥 2026 New Releases'] = CURATED_PLAYLIST_TRACKS['Trending Telugu Songs 2026'];
-CURATED_PLAYLIST_TRACKS['Latest 2026 Telugu Movie Songs Hits'] = CURATED_PLAYLIST_TRACKS['Trending Telugu Songs 2026'];
-CURATED_PLAYLIST_TRACKS['Instagram Viral Reels Trending Songs'] = CURATED_PLAYLIST_TRACKS['Trending Telugu Songs 2026'];
+const CURATED_PLAYLIST_TRACKS = {};
 
 function decodeEntities(str) {
   if (!str || typeof str !== 'string') return str || '';
@@ -755,7 +709,13 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
                 key={track.trackId || idx}
                 className={`table-track-row ${isSelected ? 'active-track' : ''}`}
                 onClick={() => handleTrackClick(track, idx)}
-                style={{ cursor: 'pointer', userSelect: 'none' }}
+                style={{
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  background: isPlayingThis ? 'rgba(0, 229, 255, 0.14)' : (isSelected ? 'rgba(255, 255, 255, 0.08)' : undefined),
+                  borderLeft: isPlayingThis ? '4px solid #00e5ff' : '4px solid transparent',
+                  transition: 'all 0.2s ease'
+                }}
               >
                 <div className="col-num" style={{ color: isPlayingThis ? '#00e5ff' : '#b3b3b3', cursor: 'pointer', userSelect: 'none' }}>
                   {isPlayingThis ? (
@@ -773,8 +733,11 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
                     style={{ width: '40px', height: '40px', minWidth: '40px', borderRadius: '4px', objectFit: 'cover', cursor: 'pointer' }}
                   />
                   <div className="track-row-details" style={{ cursor: 'pointer', userSelect: 'none', overflow: 'hidden', minWidth: 0 }}>
-                    <div className="track-row-name" title={track.trackName} style={{ fontWeight: 500, color: isPlayingThis ? '#00e5ff' : '#fff', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
-                      {displayTitle}
+                    <div className="track-row-name" title={track.trackName} style={{ fontWeight: isPlayingThis ? 700 : 500, color: isPlayingThis ? '#00e5ff' : '#fff', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px', display: 'flex', alignItems: 'center' }}>
+                      <span style={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>{displayTitle}</span>
+                      {isPlayingThis && (
+                        <span style={{ background: '#00e5ff', color: '#000', fontSize: '0.62rem', fontWeight: 800, padding: '2px 6px', borderRadius: '4px', marginLeft: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>NOW PLAYING</span>
+                      )}
                     </div>
                     <div className="track-row-artist" title={track.artistName} style={{ fontSize: '0.8rem', color: '#b3b3b3', cursor: 'pointer', userSelect: 'none', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '300px' }}>
                       {displayArtist}
