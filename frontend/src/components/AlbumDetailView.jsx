@@ -287,12 +287,38 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
         const cleanTitle = title.replace(/\(Original Motion Picture Soundtrack.*?\)/gi, '').trim();
         const lowerT = cleanTitle.toLowerCase();
         
-        let primaryQ = cleanTitle;
-        let altQ1 = `${cleanTitle} movie songs`;
-        let altQ2 = `${cleanTitle} soundtrack`;
+        const searchQueryProp = album?.searchQuery || album?.queryTag;
+        let primaryQ = searchQueryProp || cleanTitle;
+        let altQ1 = `${primaryQ} Songs`;
+        let altQ2 = `${primaryQ} Hits`;
         let altQ3 = `Telugu 2026 Songs`;
 
-        if (lowerT.includes('2026') || lowerT.includes('new releases') || lowerT.includes('trending') || lowerT.includes('viral')) {
+        if (searchQueryProp) {
+          primaryQ = searchQueryProp;
+          altQ1 = `${searchQueryProp} Songs`;
+          altQ2 = `${searchQueryProp} Hits`;
+          altQ3 = `Latest ${searchQueryProp}`;
+        } else if (lowerT.includes('telugu')) {
+          primaryQ = 'Telugu Hits';
+          altQ1 = 'Latest Telugu Songs';
+          altQ2 = 'Telugu 2026';
+          altQ3 = 'Telugu';
+        } else if (lowerT.includes('tamil')) {
+          primaryQ = 'Tamil Hits';
+          altQ1 = 'Latest Tamil Songs';
+          altQ2 = 'Tamil 2026';
+          altQ3 = 'Tamil';
+        } else if (lowerT.includes('liked') || lowerT.includes('favorite')) {
+          primaryQ = 'Telugu Hits';
+          altQ1 = 'Anirudh Hits';
+          altQ2 = 'Tamil Hits';
+          altQ3 = 'A.R. Rahman';
+        } else if (lowerT.includes('global') || lowerT.includes('top 50')) {
+          primaryQ = 'Coldplay';
+          altQ1 = 'Top Hits';
+          altQ2 = 'Pop Hits';
+          altQ3 = 'Ed Sheeran';
+        } else if (lowerT.includes('2026') || lowerT.includes('new releases') || lowerT.includes('trending') || lowerT.includes('viral')) {
           primaryQ = 'Latest Telugu';
           altQ1 = 'New Telugu Songs';
           altQ2 = 'Telugu 2026';
@@ -342,40 +368,48 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
           for (const t of initialTracks) addTrack({ ...t, collectionName: title });
         }
 
-        // Fetch multi-page results from JioSaavn Direct Proxy (up to 80-100 songs)
+        // Fetch multi-page results from JioSaavn direct API + CORS wrappers
         try {
-          const jioPromises = [
-            fetch(`/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(primaryQ)}`).then(r=>r.json()).catch(()=>null),
-            fetch(`/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=2&n=50&q=${encodeURIComponent(primaryQ)}`).then(r=>r.json()).catch(()=>null),
-            fetch(`/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(altQ1)}`).then(r=>r.json()).catch(()=>null)
+          const apiEndpoints = [
+            `https://saavn-api.vercel.app/search/songs?query=${encodeURIComponent(primaryQ)}`,
+            `https://jiosaavn-api-sigma.vercel.app/search/songs?query=${encodeURIComponent(primaryQ)}&limit=35`,
+            `/jiosaavn-proxy/api.php?__call=search.getResults&_format=json&_marker=0&p=1&n=50&q=${encodeURIComponent(primaryQ)}`
           ];
-          const jioResArr = await Promise.all(jioPromises);
-          for (const jioData of jioResArr) {
-            const rawResults = jioData?.results;
-            if (Array.isArray(rawResults)) {
-              for (let i = 0; i < rawResults.length; i++) {
-                const item = rawResults[i];
-                if (!item || !item.song) continue;
-                const tName = decodeEntities(item.song);
-                const aName = decodeEntities(item.primary_artists || item.singers || 'Various Artists');
-                const cName = decodeEntities(item.album || title);
-                const artUrl = item.image ? item.image.replace('150x150', '500x500') : '';
-                const durMs = item.duration ? parseInt(item.duration, 10) * 1000 : 210000;
-                addTrack({
-                  trackId: item.id || (900000 + i * 13),
-                  appleCatalogId: item.id || (900000 + i * 13),
-                  trackName: tName,
-                  artistName: aName,
-                  collectionName: cName,
-                  artworkUrl100: artUrl,
-                  artworkUrl60: artUrl,
-                  previewUrl: item.media_preview_url || '',
-                  encrypted_media_url: item.encrypted_media_url || '',
-                  trackTimeMillis: durMs,
-                  primaryGenreName: genre,
-                  releaseDate: item.year || releaseDate
-                });
+
+          for (const endpointUrl of apiEndpoints) {
+            try {
+              const res = await fetch(endpointUrl, { signal: AbortSignal.timeout(5000) });
+              if (!res.ok) continue;
+              const json = await res.json();
+              const items = Array.isArray(json) ? json : (json?.data?.results || json?.results || []);
+              if (Array.isArray(items) && items.length > 0) {
+                for (let i = 0; i < items.length; i++) {
+                  const item = items[i];
+                  if (!item) continue;
+                  const tName = decodeEntities(item.song || item.name || item.title || '');
+                  if (!tName) continue;
+                  const aName = decodeEntities(item.primary_artists || item.singers || item.primaryArtists || item.artist || 'Various Artists');
+                  const cName = decodeEntities(item.album || item.album?.name || title);
+                  const artUrl = item.image ? (typeof item.image === 'string' ? item.image.replace('150x150', '500x500') : (item.image[2]?.link || item.image[0]?.link || '')) : '';
+                  const durMs = item.duration ? parseInt(item.duration, 10) * 1000 : 210000;
+                  addTrack({
+                    trackId: item.id || (900000 + i * 13),
+                    appleCatalogId: item.id || (900000 + i * 13),
+                    trackName: tName,
+                    artistName: aName,
+                    collectionName: cName,
+                    artworkUrl100: artUrl,
+                    artworkUrl60: artUrl,
+                    previewUrl: item.media_preview_url || item.url || '',
+                    encrypted_media_url: item.encrypted_media_url || item.encryptedMediaUrl || '',
+                    trackTimeMillis: durMs,
+                    primaryGenreName: genre,
+                    releaseDate: item.year || releaseDate
+                  });
+                }
               }
+            } catch (e) {
+              // try next endpoint
             }
           }
         } catch (e) {
@@ -396,6 +430,18 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
           }
         } catch (e) {
           console.warn("iTunes fallback search error:", e);
+        }
+
+        // If combined track list is empty, fill with default Telugu superhit songs
+        if (combined.length === 0) {
+          const defaultTeluguHits = [
+            { trackId: 991, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/269/Hi-Nanna-Telugu-2023-20231124174006-500x500.jpg', primaryGenreName: 'Telugu' },
+            { trackId: 992, trackName: 'Chuttamalle', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+            { trackId: 993, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+            { trackId: 994, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/834/Guntur-Kaaram-Telugu-2024-20240112003859-500x500.jpg', primaryGenreName: 'Telugu' },
+            { trackId: 995, trackName: 'Ramuloo Ramulaa', artistName: 'Thaman S, Anurag Kulkarni', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/267/Ala-Vaikunthapurramuloo-Telugu-2019-20200111162332-500x500.jpg', primaryGenreName: 'Telugu' }
+          ];
+          for (const dt of defaultTeluguHits) addTrack(dt);
         }
 
         if (lowerT.includes('2026') || lowerT.includes('new releases') || lowerT.includes('trending')) {
