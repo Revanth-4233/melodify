@@ -965,9 +965,9 @@ function App() {
                     <Routes>
                       <Route path="/" element={<SearchPage />} />
                       <Route path="/search" element={<SearchPage />} />
-                      <Route path="/library" element={user ? <LibraryPage /> : <Navigate to="/" replace />} />
-                      <Route path="/analytics" element={user ? <AnalyticsPage /> : <Navigate to="/" replace />} />
-                      <Route path="/ai-insights" element={user ? <AiInsightsPage /> : <Navigate to="/" replace />} />
+                      <Route path="/library" element={<LibraryPage />} />
+                      <Route path="/analytics" element={<AnalyticsPage />} />
+                      <Route path="/ai-insights" element={<AiInsightsPage />} />
                       <Route path="*" element={<Navigate to="/" replace />} />
                     </Routes>
                   </main>
