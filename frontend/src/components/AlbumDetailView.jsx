@@ -59,12 +59,12 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
   const curated = album?.curated;
 
   const INSTANT_FALLBACK = [
-    { trackId: 991, trackName: 'Neno Butterfly', artistName: 'G.V. Prakash Kumar', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
-    { trackId: 992, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/269/Hi-Nanna-Telugu-2023-20231124174006-500x500.jpg', primaryGenreName: 'Telugu' },
-    { trackId: 993, trackName: 'Chuttamalle', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
-    { trackId: 994, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
-    { trackId: 995, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/834/Guntur-Kaaram-Telugu-2024-20240112003859-500x500.jpg', primaryGenreName: 'Telugu' },
-    { trackId: 996, trackName: 'Ramuloo Ramulaa', artistName: 'Thaman S, Anurag Kulkarni', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/267/Ala-Vaikunthapurramuloo-Telugu-2019-20200111162332-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 991, trackName: 'Neno Butterfly', artistName: 'G.V. Prakash Kumar', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/91/9d/28/919d28e7-c6ee-d0b8-c30c-2a5433ce8538/886449120786.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 992, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music123/v4/4d/7c/4a/4d7c4a33-0c3b-b0e5-1e5a-8182d9a25811/cover.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 993, trackName: 'Chuttamalle', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 994, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/86/7c/53/867c53cc-4efe-faef-a20e-8d9c896053db/8903431011411_cover.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 995, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/ff/e9/12/ffe9126b-d040-f90c-2df7-6baf1d00d1e6/cover.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 996, trackName: 'Ramuloo Ramulaa', artistName: 'Thaman S, Anurag Kulkarni', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/44/2c/3a/442c3a50-60b6-ee8b-f2ea-626d03d36bbf/886449071484.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
     { trackId: 997, trackName: 'Pushpa Pushpa', artistName: 'Nakash Aziz, Deepak Blue', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/bb/12/7ebb12e6-76dd-d922-263a-bbce5d8c3fb9/886449231840.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
     { trackId: 998, trackName: 'Naatu Naatu', artistName: 'Rahul Sipligunj, Kaala Bhairava', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/91/9d/28/919d28e7-c6ee-d0b8-c30c-2a5433ce8538/886449120786.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' }
   ];
@@ -389,11 +389,26 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
 
         const addTrack = (track) => {
           if (!track) return;
-          const normName = (track.trackName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+          const rawName = track.trackName || track.song || track.title || '';
+          const cleanTitle = rawName
+            .replace(/\(Original Motion Picture Soundtrack.*?\)/gi, '')
+            .replace(/\(From ".*?"\)/gi, '')
+            .replace(/\(From .*?\)/gi, '')
+            .replace(/- Single/gi, '')
+            .replace(/- EP/gi, '')
+            .replace(/\[.*?\]/gi, '')
+            .replace(/\(Telugu\)/gi, '')
+            .replace(/\(Tamil\)/gi, '')
+            .replace(/\(Hindi\)/gi, '')
+            .replace(/\(Original Soundtrack\)/gi, '')
+            .trim();
+
+          const normName = (cleanTitle || rawName).toLowerCase().replace(/[^a-z0-9]/g, '');
           if (!normName || seen.has(normName)) return;
           seen.add(normName);
           combined.push({
             ...track,
+            trackName: cleanTitle || rawName,
             collectionName: track.collectionName || title 
           });
         };

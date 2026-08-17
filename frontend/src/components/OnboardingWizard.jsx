@@ -82,11 +82,19 @@ export default function OnboardingWizard({ onComplete }) {
   };
 
   const handleSubmit = async () => {
-    if (formData.preferredArtists.length < 3) return;
     setLoading(true);
+    const artists = formData.preferredArtists.length > 0 
+      ? formData.preferredArtists 
+      : ['Anirudh Ravichander', 'A.R. Rahman', 'Devi Sri Prasad'];
+
+    const langs = formData.preferredLanguages.length > 0
+      ? formData.preferredLanguages
+      : ['Telugu', 'Tamil'];
+
     await onComplete({
       ...formData,
-      // Default to "User" if they skipped name step somehow
+      preferredArtists: artists,
+      preferredLanguages: langs,
       fullName: formData.fullName || 'User',
       dateOfBirth: formData.dateOfBirth || '2000-01-01'
     });
@@ -232,17 +240,16 @@ export default function OnboardingWizard({ onComplete }) {
               })}
             </div>
 
-            {formData.preferredArtists.length >= 3 && (
-              <div className="bottom-action fixed-bottom">
-                <button 
-                  className="btn-spotify-rounded" 
-                  onClick={handleSubmit}
-                  disabled={loading}
-                >
-                  {loading ? 'Creating...' : 'Done'}
-                </button>
-              </div>
-            )}
+            <div className="bottom-action fixed-bottom" style={{ zIndex: 99999, paddingBottom: '20px' }}>
+              <button 
+                className="btn-spotify-rounded" 
+                onClick={handleSubmit}
+                disabled={loading}
+                style={{ cursor: 'pointer', zIndex: 99999 }}
+              >
+                {loading ? 'Creating...' : 'Done'}
+              </button>
+            </div>
           </div>
         )}
       </div>

@@ -969,8 +969,8 @@ function App() {
                   <RightArtistSidebar width={sidebarWidth} />
                 </div>
 
-                {/* Persistent Bottom Player Bar */}
-                <BottomPlayerBar />
+                {/* Persistent Bottom Player Bar — ONLY shown when user is not in onboarding/auth and a track is active */}
+                {!showAuth && user?.preferredLanguages && currentTrack && <BottomPlayerBar />}
 
                 {/* Live Jam Session Sync Modal */}
                 {showJamModal && (
