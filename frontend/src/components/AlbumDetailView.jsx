@@ -54,8 +54,29 @@ function decodeEntities(str) {
 }
 
 function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
-  const [tracks, setTracks] = useState([]);
-  const [loadingTracks, setLoadingTracks] = useState(true);
+  const title = album?.title || album?.collectionName || 'Album Details';
+  const backendTracks = album?.backendTracks || album?.tracks;
+  const curated = album?.curated;
+
+  const INSTANT_FALLBACK = [
+    { trackId: 991, trackName: 'Neno Butterfly', artistName: 'G.V. Prakash Kumar', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 992, trackName: 'Samayama', artistName: 'Hesham Abdul Wahab', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/269/Hi-Nanna-Telugu-2023-20231124174006-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 993, trackName: 'Chuttamalle', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 994, trackName: 'Fear Song', artistName: 'Anirudh Ravichander', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/393/Devara-Part-1-Telugu-2024-20240927161205-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 995, trackName: 'Kurchi Madathapetti', artistName: 'Thaman S', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/834/Guntur-Kaaram-Telugu-2024-20240112003859-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 996, trackName: 'Ramuloo Ramulaa', artistName: 'Thaman S, Anurag Kulkarni', collectionName: title, artworkUrl100: 'https://c.saavncdn.com/267/Ala-Vaikunthapurramuloo-Telugu-2019-20200111162332-500x500.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 997, trackName: 'Pushpa Pushpa', artistName: 'Nakash Aziz, Deepak Blue', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/7e/bb/12/7ebb12e6-76dd-d922-263a-bbce5d8c3fb9/886449231840.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' },
+    { trackId: 998, trackName: 'Naatu Naatu', artistName: 'Rahul Sipligunj, Kaala Bhairava', collectionName: title, artworkUrl100: 'https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/91/9d/28/919d28e7-c6ee-d0b8-c30c-2a5433ce8538/886449120786.jpg/500x500bb.jpg', primaryGenreName: 'Telugu' }
+  ];
+
+  const initialInstant = (backendTracks && backendTracks.length > 0)
+    ? backendTracks
+    : (curated && curated.length > 0)
+      ? curated
+      : INSTANT_FALLBACK;
+
+  const [tracks, setTracks] = useState(initialInstant);
+  const [loadingTracks, setLoadingTracks] = useState(false);
   const [filterQuery, setFilterQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
   const [sortOrder, setSortOrder] = useState('custom');
@@ -69,8 +90,6 @@ function AlbumDetailView({ album, onClose, onLibraryUpdate }) {
 
   const rawCatalogId = album?.appleCatalogId || album?.collectionId;
   const catalogId = (rawCatalogId && !isNaN(Number(rawCatalogId)) && Number(rawCatalogId) > 0) ? String(rawCatalogId) : null;
-  const rawTitle = album?.title || album?.collectionName || 'Album Details';
-  const title = rawTitle;
   const rawArtist = album?.artistName || 'Aura Mix';
   const artist = (rawArtist === 'Spotify Mix' || !rawArtist || rawArtist === 'Unknown Artist') ? 'Aura Mix' : rawArtist;
   const genre = album?.genre || album?.primaryGenreName || 'Telugu/Tamil';
