@@ -1,8 +1,19 @@
+import { Capacitor } from '@capacitor/core';
+
 export const getApiBase = () => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  // Mobile Native App (Android/iOS APK)
+  if (typeof window !== 'undefined' && (Capacitor?.isNativePlatform() || window.Capacitor?.isNativePlatform())) {
+    return 'https://melodify-backend.onrender.com/api';
+  }
+  // Local Web Development (localhost / 127.0.0.1)
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return '/api';
   }
-  return 'https://sonicvault-backend-5w8l.onrender.com/api';
+  // Deployed Web App (Render)
+  return 'https://melodify-backend.onrender.com/api';
 };
 
 const API_BASE = {
@@ -22,7 +33,7 @@ const headers = (isJson = true) => {
   return h;
 };
 
-const fetchWithTimeout = async (url, options = {}, timeoutMs = 4000) => {
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 25000) => {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -80,19 +91,19 @@ export const searchApi = {
   search: (query, limit = 25, entity = 'album') =>
     fetchWithTimeout(`${API_BASE}/search?query=${encodeURIComponent(query)}&limit=${limit}&entity=${entity}`, {
       headers: headers(),
-    }, 4000).then(handleResponse),
+    }, 25000).then(handleResponse),
 
   getAlbumTracks: (id) =>
     fetchWithTimeout(`${API_BASE}/album/${id}/tracks`, {
       headers: headers(),
-    }, 4000).then(handleResponse),
+    }, 25000).then(handleResponse),
 };
 
 export const recommendationsApi = {
   getRecommendations: () =>
     fetchWithTimeout(`${API_BASE}/recommendations`, {
       headers: headers(),
-    }, 4000).then(handleResponse),
+    }, 25000).then(handleResponse),
 };
 
 export const libraryApi = {
@@ -100,7 +111,7 @@ export const libraryApi = {
     fetchWithTimeout(
       `${API_BASE}/library?page=${page}&size=${size}&sortBy=${sortBy}&direction=${direction}`,
       { headers: headers() },
-      4000
+      25000
     ).then(handleResponse),
 
   add: (data) =>
@@ -126,7 +137,7 @@ export const libraryApi = {
 
 export const analyticsApi = {
   get: () =>
-    fetchWithTimeout(`${API_BASE}/analytics`, { headers: headers() }, 4000).then(handleResponse),
+    fetchWithTimeout(`${API_BASE}/analytics`, { headers: headers() }, 25000).then(handleResponse),
   logPlay: (songId) =>
     fetchWithTimeout(`${API_BASE}/analytics/play`, {
       method: 'POST',

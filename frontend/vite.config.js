@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://sonicvault-backend-5w8l.onrender.com',
+        target: 'http://localhost:8080',
         changeOrigin: true,
-        secure: true,
+        secure: false,
       },
       '/jiosaavn-proxy': {
         target: 'https://www.jiosaavn.com',
