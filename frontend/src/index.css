@@ -724,6 +724,51 @@ body::after {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Active Playing Album Highlight & Neon Badge */
+.sonic-music-card.playing-active-album,
+.spotify-home-grid-card.playing-active-album {
+  border: 2px solid var(--neon-cyan) !important;
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.55), 0 8px 30px rgba(0, 0, 0, 0.7) !important;
+  background: rgba(6, 182, 212, 0.12) !important;
+  transform: translateY(-2px);
+}
+
+.sonic-music-card.playing-active-album .sonic-card-title {
+  color: var(--neon-cyan) !important;
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
+}
+
+.sonic-now-playing-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #06b6d4, #3b82f6);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  letter-spacing: 0.5px;
+  animation: pulseNeonBadge 2s infinite ease-in-out;
+  z-index: 5;
+}
+
+@keyframes pulseNeonBadge {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(6, 182, 212, 0.6);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(6, 182, 212, 0.95);
+    transform: scale(1.05);
+  }
+}
+
 .sonic-card-info {
   display: flex;
   flex-direction: column;

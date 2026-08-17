@@ -80,9 +80,9 @@ function Navbar({ onAuthClick }) {
 
             <div className="user-badge">
               <div className="user-avatar">
-                {user.username.charAt(0).toUpperCase()}
+                {(user?.username || user?.email || 'User').charAt(0).toUpperCase()}
               </div>
-              {user.username}
+              {user?.username || user?.email?.split('@')[0] || 'User'}
             </div>
             <button className="btn-logout" onClick={handleLogout}>
               Logout
