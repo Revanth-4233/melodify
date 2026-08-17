@@ -6,14 +6,14 @@ export const getApiBase = () => {
   }
   // Mobile Native App (Android/iOS APK)
   if (typeof window !== 'undefined' && (Capacitor?.isNativePlatform() || window.Capacitor?.isNativePlatform())) {
-    return 'https://melodify-backend.onrender.com/api';
+    return 'https://melodify-backend-z5e2.onrender.com/api';
   }
   // Local Web Development (localhost / 127.0.0.1)
   if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
     return '/api';
   }
   // Deployed Web App (Render)
-  return 'https://melodify-backend.onrender.com/api';
+  return 'https://melodify-backend-z5e2.onrender.com/api';
 };
 
 const API_BASE = {
